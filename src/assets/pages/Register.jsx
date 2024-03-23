@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Alert from "../components/Alert";
+import register from "../../../API/register_RULE";
 
 function Register() {
   const [nombre, setNombre] = useState("");
@@ -9,29 +10,47 @@ function Register() {
   const [repitPassword, setRepitPassword] = useState("");
   const [alert, setAlert] = useState({});
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if([nombre, email, password, repitPassword].includes('')){
-      setAlert({msg:'Hay campos vacios, es necesario completar todos los campos', error: true})
+    if ([nombre, email, password, repitPassword].includes("")) {
+      setAlert({
+        msg: "Hay campos vacios, es necesario completar todos los campos",
+        error: true,
+      });
       return;
     }
 
-    if(password !== repitPassword){
-      setAlert({msg:'Las contraseñas no coinciden', error: true})
+    if (password !== repitPassword) {
+      setAlert({ msg: "Las contraseñas no coinciden", error: true });
       return;
     }
 
-    if(password.length < 6){
-      setAlert({msg:'La contraseña debe ser mayor a 6 caracteres', error: true})
+    if (password.length < 6) {
+      setAlert({
+        msg: "La contraseña debe ser mayor a 6 caracteres",
+        error: true,
+      });
       return;
     }
 
-    setAlert({})
+    setAlert({});
 
-  }
+    const data = {
+      name: nombre,
+      password: password,
+      email: email,
+    };
 
-  const {msg} = alert;
+    try {
+      await register(data);
+      setAlert({ msg: "Usuario registrado correctamente, porfavor revisa tu email", error: false });
+    } catch (error) {
+      setAlert({ msg: error, error: true });
+    }
+  };
+
+  const { msg } = alert;
 
   return (
     <main
@@ -45,9 +64,8 @@ function Register() {
         </h1>
       </div>
       <div className="shadow-lg px-5 py-10 rounded-xl bg-white">
-
         {msg && <Alert alert={alert}></Alert>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="my-5">
             <label
@@ -110,13 +128,13 @@ function Register() {
             />
           </div>
           <input
-            value={"Iniciar Sesion"}
+            value={"Registrar Usuario"}
             className="bg-indigo-700 w-full rounded-xl py-3 uppercase font-bold mt-5 hover:cursor-pointer hover:bg-indigo-800 md:w-auto px-10"
             type="submit"
           />
         </form>
         <nav className="mt-5 lg:flex lg:justify-between">
-          <Link className="block text-center my-5 text-gray-500" to="/login">
+          <Link className="block text-center my-5 text-gray-500" to="/">
             Ya tienes una cuenta, Iniciar Sesion.
           </Link>
           <Link
